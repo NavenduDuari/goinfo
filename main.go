@@ -3,27 +3,24 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
 	"github.com/NavenduDuari/goinfo/covid"
 	"github.com/NavenduDuari/goinfo/crypto"
 	"github.com/NavenduDuari/goinfo/quote"
-	"github.com/NavenduDuari/goinfo/utils"
 )
 
 func main() {
-	h := func(w http.ResponseWriter, r *http.Request) {
-		resByte, _ := ioutil.ReadAll(r.Body)
-		responseMap := utils.DecodeResponse(string(resByte))
-		body, _ := url.QueryUnescape(responseMap["Body"])
+	// h := func(w http.ResponseWriter, r *http.Request) {
+	// 	resByte, _ := ioutil.ReadAll(r.Body)
+	// 	responseMap := utils.DecodeResponse(string(resByte))
+	// 	body, _ := url.QueryUnescape(responseMap["Body"])
 
-		recognizeCommandAndCall(w, body)
-	}
+	// 	recognizeCommandAndCall(w, body)
+	// }
 	m := func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "*Maintenance in going on. Please try after sometime. Sorry!*")
 	}
