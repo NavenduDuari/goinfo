@@ -1,4 +1,19 @@
-package utils
+package crypto
+
+func IsCmdValid(argsMap map[string]string) bool {
+	if len(argsMap) == 0 {
+		return true
+	}
+
+	for _, validArg := range CryptoArgs {
+		for arg := range argsMap {
+			if validArg == arg {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 var CryptoArgs = []string{"--coin=", "--conv=", "--suggest", "--help"}
 

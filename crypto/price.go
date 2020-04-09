@@ -25,21 +25,21 @@ type oneDay struct {
 
 var (
 	baseUrl        = "https://api.nomics.com/v1/currencies/ticker?key="
-	key            string
-	ids            = "&ids=BTC,ETH,XRP"
-	convert        = "&convert=INR"
-	currencySymbol = utils.CurrencyDetails["INR"].Symbol
+	currencySymbol = CurrencyDetails["INR"].Symbol
 )
 
 func getPrice(w http.ResponseWriter, coin, conv string) {
-	key = utils.NomicsApiKey
-	if len(coin) > 0 {
+	var (
+		ids     = "&ids=BTC,ETH,XRP"
+		convert = "&convert=INR"
+		key     = utils.NomicsApiKey
+	)
+	if coin != "" {
 		ids = "&ids=" + coin
 	}
-
-	if len(conv) > 0 {
+	if conv != "" {
 		convert = "&convert=" + conv
-		currencySymbol = utils.CurrencyDetails[conv].Symbol
+		currencySymbol = CurrencyDetails[conv].Symbol
 	}
 	finalUrl := baseUrl + key + ids + "&interval=1d" + convert
 
@@ -81,24 +81,24 @@ func getSuggestion(w http.ResponseWriter) {
 func getHelp(w http.ResponseWriter) {
 	content := `*gocoin* gives crypto prices.` + " \n " + `
 	commands available:
-	--coin		//to specify coin
-	--conv		//to specify conversion
-	--help		//to get help
-	--suggest	//to get suggestion
+	*--coin*		//to specify coin
+	*--conv*		//to specify conversion
+	*--help*		//to get help
+	*--suggest*	//to get suggestion
 
 	Example:
-	gocoin 		//gives price default coins in default conversion
-	gocoin --coin=BTC,LTC,BNB --conv=EUR		//gives price of LTC in EUR`
+	*gocoin* 		//gives price default coins in default conversion
+	*gocoin --coin=BTC,LTC,BNB --conv=EUR*		//gives price of LTC in EUR`
 
 	io.WriteString(w, content)
 }
 
-func Check(w http.ResponseWriter, coin, conv, suggest, help, other string) {
-	if suggest != "" {
+func Check(w http.ResponseWriter, args map[string]string, isCmdValid bool) {
+	if args["--suggest"] == "true" {
 		getSuggestion(w)
-	} else if help != "" || other != "" {
+	} else if args["--help"] == "true" || isCmdValid == false {
 		getHelp(w)
 	} else {
-		getPrice(w, coin, conv)
+		getPrice(w, args["--coin="], args["--conv="])
 	}
 }

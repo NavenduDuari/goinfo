@@ -8,8 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/NavenduDuari/goinfo/utils"
 )
 
 func getQuote(category string) responseStruct {
@@ -33,29 +31,34 @@ func getQuote(category string) responseStruct {
 func getHelp(w http.ResponseWriter) {
 	content := `*quote* gives you great quotes.` + " \n " + `
 		commands available:
-		--cat		//to specify category
-		--help		//to get help
-		--suggest	//to get suggestion
+		*--cat*		//to specify category
+		*--help*		//to get help
+		*--suggest*	//to get suggestion
 	
 		Example:
-		quote		//gives random quote
-		quote --cat=inspire		//gives quote of inspire category`
+		*quote*		//gives random quote
+		*quote --cat=inspire*		//gives quote of inspire category`
 
 	io.WriteString(w, content)
 }
-func SendQuoteWs(w http.ResponseWriter, category, suggest, help, other string) {
-	if help != "" || other != "" {
-		getHelp(w)
-	} else if suggest != "" {
-		content := `*Available categories are:*
+
+func getSuggestion(w http.ResponseWriter) {
+	content := `*Available categories are:*
+	`
+	for _, category := range QuoteCategory {
+		content = content + category + `
 		`
-		for _, category := range utils.QuoteCategory {
-			content = content + category + `
-			`
-		}
-		io.WriteString(w, content)
-	} else if category != "" {
-		response := getQuote(category)
+	}
+	io.WriteString(w, content)
+}
+
+func SendQuoteWs(w http.ResponseWriter, args map[string]string, isCmdValid bool) {
+	if args["--help"] != "" || isCmdValid == false {
+		getHelp(w)
+	} else if args["--suggest"] != "" {
+		getSuggestion(w)
+	} else if args["--cat"] != "" {
+		response := getQuote(args["--cat"])
 		quote := response.Contents.Quotes[0]
 		msg := quote.Quote + `
 -- ` + "*" + quote.Author + "*"
@@ -63,7 +66,7 @@ func SendQuoteWs(w http.ResponseWriter, category, suggest, help, other string) {
 		io.WriteString(w, msg)
 	} else {
 		rand.Seed(time.Now().UnixNano())
-		cat := utils.QuoteCategory[rand.Intn(len(utils.QuoteCategory))]
+		cat := QuoteCategory[rand.Intn(len(QuoteCategory))]
 		response := getQuote(cat)
 		quote := response.Contents.Quotes[0]
 		msg := quote.Quote + `

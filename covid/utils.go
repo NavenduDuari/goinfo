@@ -1,4 +1,19 @@
-package utils
+package covid
+
+func IsCmdValid(argsMap map[string]string) bool {
+	if len(argsMap) == 0 {
+		return true
+	}
+
+	for _, validArg := range CovidArgs {
+		for arg := range argsMap {
+			if validArg == arg {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 var CovidArgs = []string{"--state=", "--suggest", "--help"}
 

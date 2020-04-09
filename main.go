@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -17,13 +18,13 @@ import (
 
 func main() {
 	h := func(w http.ResponseWriter, r *http.Request) {
-		// resByte, _ := ioutil.ReadAll(r.Body)
-		// responseMap := utils.DecodeResponse(string(resByte))
-		// body, _ := url.QueryUnescape(responseMap["Body"])
+		resByte, _ := ioutil.ReadAll(r.Body)
+		responseMap := utils.DecodeResponse(string(resByte))
+		body, _ := url.QueryUnescape(responseMap["Body"])
 
-		// recognizeCommandAndCall(w, body)
+		recognizeCommandAndCall(w, body)
 
-		io.WriteString(w, "*Under Maintenance. Please try after sometime. Sorry!*")
+		// io.WriteString(w, "*Under Maintenance. Please try after sometime. Sorry!*")
 	}
 
 	http.HandleFunc("/endpoint", h)
@@ -34,7 +35,6 @@ func main() {
 	} else {
 		port = ":" + port
 	}
-	fmt.Println(port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
 
@@ -57,55 +57,30 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 		}
 	}
 
-	other := ""
 	switch c.cmd {
 	case "gocoin":
-		if c.args != nil {
-			other = "true"
+		if crypto.IsCmdValid(c.args) {
+			crypto.Check(w, c.args, true)
 		} else {
-			for arg := range c.args {
-				for _, validArg := range utils.CryptoArgs {
-					if validArg == arg {
-						other = ""
-						break
-					}
-				}
-			}
+			crypto.Check(w, c.args, false)
 		}
-		crypto.Check(w, c.args["--coin="], c.args["--conv="], c.args["--suggest"], c.args["--help"], other)
 	case "covid":
-		if c.args != nil {
-			other = "true"
+		if covid.IsCmdValid(c.args) {
+			covid.SendCovidWs(w, c.args, true)
 		} else {
-			for arg := range c.args {
-				for _, validArg := range utils.CovidArgs {
-					if validArg == arg {
-						other = ""
-						break
-					}
-				}
-			}
+			covid.SendCovidWs(w, c.args, false)
 		}
-		covid.SendCovidWs(w, c.args["--state="], c.args["--suggest"], c.args["--help"], other)
 	case "quote":
-		if c.args != nil {
-			other = "true"
+		if quote.IsCmdValid(c.args) {
+			quote.SendQuoteWs(w, c.args, true)
 		} else {
-			for arg := range c.args {
-				for _, validArg := range utils.QuoteArgs {
-					if validArg == arg {
-						other = ""
-						break
-					}
-				}
-			}
+			quote.SendQuoteWs(w, c.args, false)
 		}
-		quote.SendQuoteWs(w, c.args["--cat="], c.args["--suggest"], c.args["--help"], other)
 	default:
 		content := `Try:
-			gocoin --help
-			covid --help
-			quote --help`
+		*gocoin --help*
+		*covid --help*
+		*quote --help*`
 		io.WriteString(w, content)
 	}
 }

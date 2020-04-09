@@ -6,8 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/NavenduDuari/goinfo/utils"
 )
 
 func getCovidData() covidStruct {
@@ -31,29 +29,35 @@ func getCovidData() covidStruct {
 func getHelp(w http.ResponseWriter) {
 	content := `*covid* gives covid data.` + " \n " + `
 	commands available:
-	--state		//to specify statae
-	--help		//to get help
-	--suggest	//to get suggestion
+	*--state*		//to specify statae
+	*--help*		//to get help
+	*--suggest*	//to get suggestion
 
 	Example:
-	covid		//gives data of India
-	covid --state=WB		//gives data of West Bengal`
+	*covid*		//gives data of India
+	*covid --state=WB*		//gives data of West Bengal`
 
 	io.WriteString(w, content)
 }
-func SendCovidWs(w http.ResponseWriter, state, suggest, help, other string) {
+func SendCovidWs(w http.ResponseWriter, args map[string]string, isCmdValid bool) {
 	var msg string
 	var todayData statewiseCases
 	covidObj := getCovidData()
-	if suggest != "" {
+	if args["--suggest"] != "" {
 		getSuggestion(w)
-	} else if help != "" || other != "" {
+	} else if args["--help"] != "" || isCmdValid == false {
 		getHelp(w)
-	} else if state != "" {
+	} else if args["--state="] != "" {
+		var stateFound bool
 		for _, stateData := range covidObj.Statewise {
-			if stateData.Statecode == state {
+			if stateData.Statecode == args["--state="] {
 				todayData = stateData
+				stateFound = true
 			}
+		}
+		if !stateFound {
+			getSuggestion(w)
+			return
 		}
 		msg = `Last Updated: ` + todayData.Lastupdatedtime + `
 State: ` + todayData.State + "(" + todayData.Statecode + ")" + `
@@ -73,16 +77,13 @@ Stay HOME, Stay SAFE` + `
 	}
 
 	io.WriteString(w, msg)
-	// for _, no := range utils.Contact {
-	// 	twilio.SendWhatsappMsg(no, msg)
-	// }
 }
 
 func getSuggestion(w http.ResponseWriter) {
 	content := ""
-	for stateId, stateName := range utils.States {
+	for stateId, stateName := range States {
 		content = content + `
-Id: *` + stateId + `* Name: ` + stateName + `
+		Name: ` + stateName + ` Id: *` + stateId + `*
 `
 	}
 	io.WriteString(w, content)
