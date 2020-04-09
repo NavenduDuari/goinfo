@@ -30,10 +30,8 @@ func getQuote(category string) responseStruct {
 
 	return responseObj
 }
-
-func SendQuoteWs(w http.ResponseWriter, category, suggest, help interface{}) {
-	if help != nil {
-		content := `*quote* gives you great quotes.` + " \n " + `
+func getHelp(w http.ResponseWriter) {
+	content := `*quote* gives you great quotes.` + " \n " + `
 		commands available:
 		--cat		//to specify category
 		--help		//to get help
@@ -43,8 +41,12 @@ func SendQuoteWs(w http.ResponseWriter, category, suggest, help interface{}) {
 		quote		//gives random quote
 		quote --cat=inspire		//gives quote of inspire category`
 
-		io.WriteString(w, content)
-	} else if suggest != nil {
+	io.WriteString(w, content)
+}
+func SendQuoteWs(w http.ResponseWriter, category, suggest, help, other string) {
+	if help != "" || other != "" {
+		getHelp(w)
+	} else if suggest != "" {
 		content := `*Available categories are:*
 		`
 		for _, category := range utils.QuoteCategory {
@@ -52,8 +54,8 @@ func SendQuoteWs(w http.ResponseWriter, category, suggest, help interface{}) {
 			`
 		}
 		io.WriteString(w, content)
-	} else if category != nil {
-		response := getQuote(category.(string))
+	} else if category != "" {
+		response := getQuote(category)
 		quote := response.Contents.Quotes[0]
 		msg := quote.Quote + `
 -- ` + "*" + quote.Author + "*"

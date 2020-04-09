@@ -93,16 +93,14 @@ func getHelp(w http.ResponseWriter) {
 	io.WriteString(w, content)
 }
 
-func Check(w http.ResponseWriter, coin, conv, suggest, help string) {
-	var (
-		coinString string
-		convString string
-	)
+func Check(w http.ResponseWriter, coin, conv, suggest, help, other string) {
 	if suggest != "" {
 		getSuggestion(w)
-	} else if help != "" {
+	} else if help != "" || other != "" {
 		getHelp(w)
+	} else if coin != "" || conv != "" {
+		getPrice(w, coin, conv)
 	} else {
-		getPrice(w, coinString, convString)
+
 	}
 }

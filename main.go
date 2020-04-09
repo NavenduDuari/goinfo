@@ -58,14 +58,29 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 
 	switch c.cmd {
 	case "gocoin":
-		// for flag, val := range c.cmd {
-		// 	// if flag
-		// }
-		crypto.Check(w, c.args["--coin"], c.args["--conv"], c.args["--suggest"], c.args["--help"])
+		var other string
+		for arg, _ := range c.args {
+			if arg != "--coin" || arg != "--conv" || arg != "--suggest" || arg != "--help" {
+				other = "true"
+			}
+		}
+		crypto.Check(w, c.args["--coin"], c.args["--conv"], c.args["--suggest"], c.args["--help"], other)
 	case "covid":
-		covid.SendCovidWs(w, c.args["--state"], c.args["--suggest"], c.args["--help"])
+		var other string
+		for arg, _ := range c.args {
+			if arg != "--state" || arg != "--suggest" || arg != "--help" {
+				other = "true"
+			}
+		}
+		covid.SendCovidWs(w, c.args["--state"], c.args["--suggest"], c.args["--help"], other)
 	case "quote":
-		quote.SendQuoteWs(w, c.args["--cat"], c.args["--suggest"], c.args["--help"])
+		var other string
+		for arg, _ := range c.args {
+			if arg != "--coin" || arg != "--cat" || arg != "--suggest" || arg != "--help" {
+				other = "true"
+			}
+		}
+		quote.SendQuoteWs(w, c.args["--cat"], c.args["--suggest"], c.args["--help"], other)
 	default:
 		content := `Try:
 			gocoin --help

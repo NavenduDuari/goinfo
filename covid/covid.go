@@ -28,25 +28,27 @@ func getCovidData() covidStruct {
 
 	return covidObj
 }
+func getHelp(w http.ResponseWriter) {
+	content := `*covid* gives covid data.` + " \n " + `
+	commands available:
+	--state		//to specify statae
+	--help		//to get help
+	--suggest	//to get suggestion
 
-func SendCovidWs(w http.ResponseWriter, state, suggest, help string) {
+	Example:
+	covid		//gives data of India
+	covid --state=WB		//gives data of West Bengal`
+
+	io.WriteString(w, content)
+}
+func SendCovidWs(w http.ResponseWriter, state, suggest, help, other string) {
 	var msg string
 	var todayData statewiseCases
 	covidObj := getCovidData()
 	if suggest != "" {
 		getSuggestion(w)
-	} else if help != "" {
-		content := `*covid* gives covid data.` + " \n " + `
-		commands available:
-		--state		//to specify statae
-		--help		//to get help
-		--suggest	//to get suggestion
-	
-		Example:
-		covid		//gives data of India
-		covid --state=WB		//gives data of West Bengal`
-
-		io.WriteString(w, content)
+	} else if help != "" || other != "" {
+		getHelp(w)
 	} else if state != "" {
 		for _, stateData := range covidObj.Statewise {
 			if stateData.Statecode == state {
