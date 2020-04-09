@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/NavenduDuari/goinfo/covid"
@@ -25,7 +27,14 @@ func main() {
 
 	http.HandleFunc("/endpoint", h)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":8080"
+	} else {
+		port = ":" + port
+	}
+	fmt.Println(port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
 
 type command struct {
