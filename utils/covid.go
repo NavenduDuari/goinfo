@@ -1,6 +1,6 @@
 package utils
 
-var CovidArgs = []string{"--state", "--suggest", "--help"}
+var CovidArgs = []string{"--state=", "--suggest", "--help"}
 
 var States = map[string]string{
 	"MH": "Maharashtra",

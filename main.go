@@ -51,7 +51,7 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 	words := strings.Split(cmdStr, " ")
 	c.cmd = words[0]
 	for i := 1; i < len(words); i++ {
-		temp := strings.Split(words[i], "=")
+		temp := strings.SplitAfter(words[i], "=")
 		if len(temp) < 2 {
 			c.args[temp[0]] = "true"
 		} else {
@@ -59,40 +59,50 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 		}
 	}
 
+	var other string
 	switch c.cmd {
 	case "gocoin":
-		other := "true"
-		for arg := range c.args {
-			for _, validArg := range utils.CryptoArgs {
-				if validArg == arg {
-					other = ""
-					break
+		if c.args != nil {
+			other = "true"
+		} else {
+			for arg := range c.args {
+				for _, validArg := range utils.CryptoArgs {
+					if validArg == arg {
+						other = ""
+						break
+					}
 				}
 			}
 		}
-		crypto.Check(w, c.args["--coin"], c.args["--conv"], c.args["--suggest"], c.args["--help"], other)
+		crypto.Check(w, c.args["--coin="], c.args["--conv="], c.args["--suggest"], c.args["--help"], other)
 	case "covid":
-		other := "true"
-		for arg := range c.args {
-			for _, validArg := range utils.CovidArgs {
-				if validArg == arg {
-					other = ""
-					break
+		if c.args != nil {
+			other = "true"
+		} else {
+			for arg := range c.args {
+				for _, validArg := range utils.CovidArgs {
+					if validArg == arg {
+						other = ""
+						break
+					}
 				}
 			}
 		}
-		covid.SendCovidWs(w, c.args["--state"], c.args["--suggest"], c.args["--help"], other)
+		covid.SendCovidWs(w, c.args["--state="], c.args["--suggest"], c.args["--help"], other)
 	case "quote":
-		other := "true"
-		for arg := range c.args {
-			for _, validArg := range utils.QuoteArgs {
-				if validArg == arg {
-					other = ""
-					break
+		if c.args != nil {
+			other = "true"
+		} else {
+			for arg := range c.args {
+				for _, validArg := range utils.QuoteArgs {
+					if validArg == arg {
+						other = ""
+						break
+					}
 				}
 			}
 		}
-		quote.SendQuoteWs(w, c.args["--cat"], c.args["--suggest"], c.args["--help"], other)
+		quote.SendQuoteWs(w, c.args["--cat="], c.args["--suggest"], c.args["--help"], other)
 	default:
 		content := `Try:
 			gocoin --help
