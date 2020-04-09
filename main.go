@@ -3,10 +3,14 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
+
+	"github.com/NavenduDuari/goinfo/utils"
 
 	"github.com/NavenduDuari/goinfo/covid"
 	"github.com/NavenduDuari/goinfo/crypto"
@@ -14,18 +18,17 @@ import (
 )
 
 func main() {
-	// h := func(w http.ResponseWriter, r *http.Request) {
-	// 	resByte, _ := ioutil.ReadAll(r.Body)
-	// 	responseMap := utils.DecodeResponse(string(resByte))
-	// 	body, _ := url.QueryUnescape(responseMap["Body"])
+	h := func(w http.ResponseWriter, r *http.Request) {
+		resByte, _ := ioutil.ReadAll(r.Body)
+		responseMap := utils.DecodeResponse(string(resByte))
+		body, _ := url.QueryUnescape(responseMap["Body"])
 
-	// 	recognizeCommandAndCall(w, body)
-	// }
-	m := func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "*Maintenance in going on. Please try after sometime. Sorry!*")
+		recognizeCommandAndCall(w, body)
+
+		// io.WriteString(w, "*Maintenance in going on. Please try after sometime. Sorry!*")
 	}
 
-	http.HandleFunc("/endpoint", m)
+	http.HandleFunc("/endpoint", h)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -59,8 +62,8 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 	switch c.cmd {
 	case "gocoin":
 		var other string
-		for arg, _ := range c.args {
-			if arg != "--coin" || arg != "--conv" || arg != "--suggest" || arg != "--help" {
+		for arg := range c.args {
+			if !strings.Contains(utils.CryptoArgs, arg) {
 				other = "true"
 			}
 		}
@@ -68,15 +71,16 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 	case "covid":
 		var other string
 		for arg, _ := range c.args {
-			if arg != "--state" || arg != "--suggest" || arg != "--help" {
+			if !strings.Contains(utils.CovidArgs, arg) {
 				other = "true"
+
 			}
 		}
 		covid.SendCovidWs(w, c.args["--state"], c.args["--suggest"], c.args["--help"], other)
 	case "quote":
 		var other string
 		for arg, _ := range c.args {
-			if arg != "--coin" || arg != "--cat" || arg != "--suggest" || arg != "--help" {
+			if !strings.Contains(utils.QuoteArgs, arg) {
 				other = "true"
 			}
 		}

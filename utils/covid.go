@@ -1,5 +1,7 @@
 package utils
 
+var CovidArgs = "--state--suggest--help"
+
 var States = map[string]string{
 	"MH": "Maharashtra",
 	"TN": "Tamil Nadu",
