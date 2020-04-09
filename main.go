@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
@@ -19,13 +17,13 @@ import (
 
 func main() {
 	h := func(w http.ResponseWriter, r *http.Request) {
-		resByte, _ := ioutil.ReadAll(r.Body)
-		responseMap := utils.DecodeResponse(string(resByte))
-		body, _ := url.QueryUnescape(responseMap["Body"])
+		// resByte, _ := ioutil.ReadAll(r.Body)
+		// responseMap := utils.DecodeResponse(string(resByte))
+		// body, _ := url.QueryUnescape(responseMap["Body"])
 
-		recognizeCommandAndCall(w, body)
+		// recognizeCommandAndCall(w, body)
 
-		// io.WriteString(w, "*Maintenance in going on. Please try after sometime. Sorry!*")
+		io.WriteString(w, "*Under Maintenance. Please try after sometime. Sorry!*")
 	}
 
 	http.HandleFunc("/endpoint", h)
