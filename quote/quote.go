@@ -74,7 +74,4 @@ func SendQuoteWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 
 		io.WriteString(w, msg)
 	}
-	// for _, no := range utils.Contact {
-	// 	twilio.SendWhatsappMsg(no, msg)
-	// }
 }

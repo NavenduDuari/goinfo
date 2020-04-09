@@ -12,5 +12,4 @@ func DecodeResponse(responseString string) map[string]string {
 		responseMap[temp[0]] = temp[1]
 	}
 	return responseMap
-	// fmt.Println(responseMap["Body"])
 }
