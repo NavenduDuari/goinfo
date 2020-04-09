@@ -24,8 +24,11 @@ func main() {
 
 		recognizeCommandAndCall(w, body)
 	}
+	m := func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "*Maintenance in going on. Please try after sometime. Sorry!*")
+	}
 
-	http.HandleFunc("/endpoint", h)
+	http.HandleFunc("/endpoint", m)
 
 	port := os.Getenv("PORT")
 	if port == "" {
