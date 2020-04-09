@@ -1,6 +1,6 @@
 package utils
 
-var QuoteArgs = "--cat--suggest--help"
+var QuoteArgs = []string{"--cat", "--suggest", "--help"}
 
 var QuoteCategory = []string{
 	"inspire",

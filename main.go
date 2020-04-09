@@ -61,27 +61,35 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 
 	switch c.cmd {
 	case "gocoin":
-		var other string
+		other := "true"
 		for arg := range c.args {
-			if !strings.Contains(utils.CryptoArgs, arg) {
-				other = "true"
+			for _, validArg := range utils.CryptoArgs {
+				if validArg == arg {
+					other = ""
+					break
+				}
 			}
 		}
 		crypto.Check(w, c.args["--coin"], c.args["--conv"], c.args["--suggest"], c.args["--help"], other)
 	case "covid":
-		var other string
-		for arg, _ := range c.args {
-			if !strings.Contains(utils.CovidArgs, arg) {
-				other = "true"
-
+		other := "true"
+		for arg := range c.args {
+			for _, validArg := range utils.CovidArgs {
+				if validArg == arg {
+					other = ""
+					break
+				}
 			}
 		}
 		covid.SendCovidWs(w, c.args["--state"], c.args["--suggest"], c.args["--help"], other)
 	case "quote":
-		var other string
-		for arg, _ := range c.args {
-			if !strings.Contains(utils.QuoteArgs, arg) {
-				other = "true"
+		other := "true"
+		for arg := range c.args {
+			for _, validArg := range utils.QuoteArgs {
+				if validArg == arg {
+					other = ""
+					break
+				}
 			}
 		}
 		quote.SendQuoteWs(w, c.args["--cat"], c.args["--suggest"], c.args["--help"], other)

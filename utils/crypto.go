@@ -1,6 +1,6 @@
 package utils
 
-var CryptoArgs = "--coin--conv--suggest--help"
+var CryptoArgs = []string{"--coin", "--conv", "--suggest", "--help"}
 
 var CoinDetails = map[string]string{
 	"BTC":  "Bitcoin",
