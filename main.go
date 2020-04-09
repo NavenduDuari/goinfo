@@ -59,7 +59,7 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 		}
 	}
 
-	var other string
+	other := ""
 	switch c.cmd {
 	case "gocoin":
 		if c.args != nil {
