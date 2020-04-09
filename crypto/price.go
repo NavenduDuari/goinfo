@@ -98,9 +98,7 @@ func Check(w http.ResponseWriter, coin, conv, suggest, help, other string) {
 		getSuggestion(w)
 	} else if help != "" || other != "" {
 		getHelp(w)
-	} else if coin != "" || conv != "" {
-		getPrice(w, coin, conv)
 	} else {
-
+		getPrice(w, coin, conv)
 	}
 }
