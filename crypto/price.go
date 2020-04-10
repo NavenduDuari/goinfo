@@ -79,7 +79,7 @@ func getSuggestion(w http.ResponseWriter) {
 
 }
 func getHelp(w http.ResponseWriter) {
-	content := `*gocoin* gives crypto prices.` + " \n " + `
+	content := `*crypto* gives prices of crypto-currencies.` + " \n " + `
 	commands available:
 	*--coin*		//to specify coin
 	*--conv*		//to specify conversion
@@ -87,8 +87,8 @@ func getHelp(w http.ResponseWriter) {
 	*--suggest*	//to get suggestion
 
 	Example:
-	*gocoin* 		//gives price default coins in default conversion
-	*gocoin --coin=BTC,LTC,BNB --conv=EUR*		//gives price of LTC in EUR`
+	*crypto* 		//gives price default coins in default conversion
+	*crypto --coin=BTC,LTC,BNB --conv=EUR*		//gives price of LTC in EUR`
 
 	io.WriteString(w, content)
 }

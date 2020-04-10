@@ -58,7 +58,7 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 	}
 
 	switch c.cmd {
-	case "gocoin":
+	case "crypto":
 		if crypto.IsCmdValid(c.args) {
 			crypto.Check(w, c.args, true)
 		} else {
@@ -78,7 +78,7 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 		}
 	default:
 		content := `Try:
-		*gocoin --help*
+		*crypto --help*
 		*covid --help*
 		*quote --help*`
 		io.WriteString(w, content)
