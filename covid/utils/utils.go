@@ -1,4 +1,4 @@
-package covid
+package utils
 
 func IsCmdValid(argsMap map[string]string) bool {
 	if len(argsMap) == 0 {

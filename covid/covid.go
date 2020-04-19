@@ -6,6 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/NavenduDuari/goinfo/covid/utils"
 )
 
 func getCovidData() covidStruct {
@@ -81,7 +83,7 @@ Stay HOME, Stay SAFE` + `
 
 func getSuggestion(w http.ResponseWriter) {
 	content := ""
-	for stateId, stateName := range States {
+	for stateId, stateName := range utils.States {
 		content = content + `
 		Name: ` + stateName + ` Id: *` + stateId + `*
 `

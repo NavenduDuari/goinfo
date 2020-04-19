@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/NavenduDuari/goinfo/quote/utils"
 )
 
 func getQuote(category string) responseStruct {
@@ -45,7 +47,7 @@ func getHelp(w http.ResponseWriter) {
 func getSuggestion(w http.ResponseWriter) {
 	content := `*Available categories are:*
 	`
-	for _, category := range QuoteCategory {
+	for _, category := range utils.QuoteCategory {
 		content = content + category + `
 		`
 	}
@@ -66,7 +68,7 @@ func SendQuoteWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 		io.WriteString(w, msg)
 	} else {
 		rand.Seed(time.Now().UnixNano())
-		cat := QuoteCategory[rand.Intn(len(QuoteCategory))]
+		cat := utils.QuoteCategory[rand.Intn(len(utils.QuoteCategory))]
 		response := getQuote(cat)
 		quote := response.Contents.Quotes[0]
 		msg := quote.Quote + `

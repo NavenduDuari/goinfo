@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -9,11 +10,16 @@ import (
 	"os"
 	"strings"
 
+	"github.com/NavenduDuari/goinfo/gogit"
 	"github.com/NavenduDuari/goinfo/utils"
 
 	"github.com/NavenduDuari/goinfo/covid"
+	covidUtils "github.com/NavenduDuari/goinfo/covid/utils"
 	"github.com/NavenduDuari/goinfo/crypto"
+	cryptoUtils "github.com/NavenduDuari/goinfo/crypto/utils"
+	gogitUtils "github.com/NavenduDuari/goinfo/gogit/utils"
 	"github.com/NavenduDuari/goinfo/quote"
+	quoteUtils "github.com/NavenduDuari/goinfo/quote/utils"
 )
 
 func main() {
@@ -59,28 +65,38 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 
 	switch c.cmd {
 	case "crypto":
-		if crypto.IsCmdValid(c.args) {
+		if cryptoUtils.IsCmdValid(c.args) {
 			crypto.Check(w, c.args, true)
 		} else {
 			crypto.Check(w, c.args, false)
 		}
 	case "covid":
-		if covid.IsCmdValid(c.args) {
+		if covidUtils.IsCmdValid(c.args) {
 			covid.SendCovidWs(w, c.args, true)
 		} else {
 			covid.SendCovidWs(w, c.args, false)
 		}
 	case "quote":
-		if quote.IsCmdValid(c.args) {
+		if quoteUtils.IsCmdValid(c.args) {
 			quote.SendQuoteWs(w, c.args, true)
 		} else {
 			quote.SendQuoteWs(w, c.args, false)
 		}
+	case "gogit":
+		fmt.Println("within gogit case")
+		fmt.Println(c.args)
+		if gogitUtils.IsCmdValid(c.args) {
+			gogit.ServeGogit(w, c.args, true)
+		} else {
+			gogit.ServeGogit(w, c.args, false)
+		}
 	default:
-		content := `Try:
+		content := `Welcome to *GOINFO*
+		Try:
 		*crypto --help*
 		*covid --help*
-		*quote --help*`
+		*quote --help*
+		*gogit --help*`
 		io.WriteString(w, content)
 	}
 }

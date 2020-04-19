@@ -1,4 +1,15 @@
-package quote
+package utils
+
+var QuoteArgs = []string{"--cat=", "--suggest", "--help"}
+
+var QuoteCategory = []string{
+	"inspire",
+	"management",
+	"life",
+	"love",
+	"art",
+	"students",
+}
 
 func IsCmdValid(argsMap map[string]string) bool {
 	if len(argsMap) == 0 {
@@ -13,15 +24,4 @@ func IsCmdValid(argsMap map[string]string) bool {
 		}
 	}
 	return false
-}
-
-var QuoteArgs = []string{"--cat=", "--suggest", "--help"}
-
-var QuoteCategory = []string{
-	"inspire",
-	"management",
-	"life",
-	"love",
-	"art",
-	"students",
 }

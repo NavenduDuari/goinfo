@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/NavenduDuari/goinfo/utils"
+	"github.com/NavenduDuari/goinfo/crypto/utils"
 )
 
 type coinData struct {
@@ -25,7 +25,7 @@ type oneDay struct {
 
 var (
 	baseUrl        = "https://api.nomics.com/v1/currencies/ticker?key="
-	currencySymbol = CurrencyDetails["INR"].Symbol
+	currencySymbol = utils.CurrencyDetails["INR"].Symbol
 )
 
 func getPrice(w http.ResponseWriter, coin, conv string) {
@@ -39,7 +39,7 @@ func getPrice(w http.ResponseWriter, coin, conv string) {
 	}
 	if conv != "" {
 		convert = "&convert=" + conv
-		currencySymbol = CurrencyDetails[conv].Symbol
+		currencySymbol = utils.CurrencyDetails[conv].Symbol
 	}
 	finalUrl := baseUrl + key + ids + "&interval=1d" + convert
 
