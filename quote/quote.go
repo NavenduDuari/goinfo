@@ -59,8 +59,8 @@ func SendQuoteWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 		getHelp(w)
 	} else if args["--suggest"] != "" {
 		getSuggestion(w)
-	} else if args["--cat"] != "" {
-		response := getQuote(args["--cat"])
+	} else if args["--cat="] != "" {
+		response := getQuote(args["--cat="])
 		quote := response.Contents.Quotes[0]
 		msg := quote.Quote + `
 -- ` + "*" + quote.Author + "*"

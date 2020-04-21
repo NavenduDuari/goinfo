@@ -3,38 +3,43 @@ package gogit
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
+	"sort"
 
 	"github.com/NavenduDuari/goinfo/gogit/utils"
 )
 
 var (
-	totalByteCount            float64
-	languageWithByteStructArr []*utils.LanguageWithByteStruct
+// totalByteCount float64
 )
 
-func getLanguages(w http.ResponseWriter) []utils.LanguageWithByteMap {
-	fmt.Println("within getLanguages")
-	io.WriteString(w, "within getLanguages")
-
+func getLanguages(userName string) []utils.LanguageWithByteMap {
 	var languages []utils.LanguageWithByteMap
-	repos := getRepos(w)
-	for _, repo := range repos {
+	repos := getRepos(userName)
+	go func() {
+		for _, repo := range repos {
+			languagesURL := getLanguagesURL(userName, repo.Name)
+			fmt.Println("Lang url : ", languagesURL)
+			go getInfo(languagesURL)
+		}
+	}()
+
+	for i := 1; i <= len(repos); i++ {
+		rawLang, ok := <-utils.RawInfo
+		if !ok {
+			continue
+		}
 		var lang utils.LanguageWithByteMap
-		languagesURL := getLanguagesURL(repo.Name)
-		rawLang := getInfo(w, languagesURL)
 		json.Unmarshal([]byte(rawLang), &lang)
 		languages = append(languages, lang)
 	}
+
 	return languages
 }
 
-func calculateLanguageByte(w http.ResponseWriter) []*utils.LanguageWithByteStruct {
-	fmt.Println("within calculateLanguageByte")
-	io.WriteString(w, "within calculateLanguageByte")
-
-	languageWithByteMapArr := getLanguages(w)
+func calculateLanguageByte(userName string) ([]*utils.LanguageWithByteStruct, float64) {
+	var totalByteCount float64
+	var languageWithByteStructArr []*utils.LanguageWithByteStruct
+	languageWithByteMapArr := getLanguages(userName)
 	for _, languageWithByteMap := range languageWithByteMapArr {
 		for lang, byteCount := range languageWithByteMap {
 			isUpdated := false
@@ -66,16 +71,13 @@ func calculateLanguageByte(w http.ResponseWriter) []*utils.LanguageWithByteStruc
 		}
 	}
 
-	return languageWithByteStructArr
+	return languageWithByteStructArr, totalByteCount
 }
 
-func GetLanguagePercentage(w http.ResponseWriter) []utils.LanguageWithPercentageStruct {
-	fmt.Println("within GetLanguagePercentage")
-	io.WriteString(w, "within GetLanguagePercentage")
-
+func GetLanguagePercentage(userName string) []utils.LanguageWithPercentageStruct {
 	var languageWithPercentageStructArr []utils.LanguageWithPercentageStruct
 
-	languageWithByteStructArr := calculateLanguageByte(w)
+	languageWithByteStructArr, totalByteCount := calculateLanguageByte(userName)
 	for _, languageWithByteStruct := range languageWithByteStructArr {
 		languageWithPercentageStructArr = append(languageWithPercentageStructArr,
 			utils.LanguageWithPercentageStruct{
@@ -83,5 +85,9 @@ func GetLanguagePercentage(w http.ResponseWriter) []utils.LanguageWithPercentage
 				Percentage: (languageWithByteStruct.ByteCount / totalByteCount * 100),
 			})
 	}
+	sort.SliceStable(languageWithPercentageStructArr, func(i, j int) bool {
+		return languageWithPercentageStructArr[i].Percentage > languageWithPercentageStructArr[j].Percentage
+	})
+	// utils.GetLang <- languageWithPercentageStructArr
 	return languageWithPercentageStructArr
 }

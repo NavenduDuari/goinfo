@@ -65,32 +65,35 @@ func recognizeCommandAndCall(w http.ResponseWriter, cmdStr string) {
 
 	switch c.cmd {
 	case "crypto":
+		fmt.Println("crypto")
 		if cryptoUtils.IsCmdValid(c.args) {
 			crypto.Check(w, c.args, true)
 		} else {
 			crypto.Check(w, c.args, false)
 		}
 	case "covid":
+		fmt.Println("covid")
 		if covidUtils.IsCmdValid(c.args) {
 			covid.SendCovidWs(w, c.args, true)
 		} else {
 			covid.SendCovidWs(w, c.args, false)
 		}
 	case "quote":
+		fmt.Println("quote")
 		if quoteUtils.IsCmdValid(c.args) {
 			quote.SendQuoteWs(w, c.args, true)
 		} else {
 			quote.SendQuoteWs(w, c.args, false)
 		}
 	case "gogit":
-		fmt.Println("within gogit case")
-		fmt.Println(c.args)
+		fmt.Println("gogit")
 		if gogitUtils.IsCmdValid(c.args) {
 			gogit.ServeGogit(w, c.args, true)
 		} else {
 			gogit.ServeGogit(w, c.args, false)
 		}
 	default:
+		fmt.Println("default")
 		content := `Welcome to *GOINFO*
 		Try:
 		*crypto --help*

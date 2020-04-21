@@ -2,8 +2,12 @@ package gogit
 
 import (
 	"fmt"
+	"html"
 	"io"
 	"net/http"
+	"strconv"
+
+	"github.com/NavenduDuari/goinfo/gogit/utils"
 )
 
 func getHelp(w http.ResponseWriter) {
@@ -19,40 +23,34 @@ func getHelp(w http.ResponseWriter) {
 	io.WriteString(w, content)
 }
 
-func getInsight(w http.ResponseWriter, name string) string {
-	fmt.Println("within getInsight")
-	io.WriteString(w, "within getInsight")
-
-	var langResp = ""
-	langauges := GetLanguagePercentage(w)
+func getInsight(userName string) string {
+	emojiFingure := html.UnescapeString("&#" + strconv.Itoa(128073) + ";")
+	emojiAvatar := html.UnescapeString("&#" + strconv.Itoa(128100) + ";")
+	var langResp = emojiFingure + ` Languages(%) => `
+	langauges := GetLanguagePercentage(userName)
 	for _, lang := range langauges {
-		langResp += fmt.Sprintf("%s -- %.2f \n", lang.Language, lang.Percentage)
+		langResp += fmt.Sprintf("\n\t\t\t\t%s -- *%.2f*", lang.Language, lang.Percentage)
 	}
-	locResp := fmt.Sprintf("Total LOC => %d", GetLOC(w))
-	commitResp := fmt.Sprintf("Total Commits => %d", GetCommitCount(w))
-	response := locResp + "\n" + commitResp + "\n" + langResp
+	locResp := fmt.Sprintf("%s Total LOC => *%d* ", emojiFingure, GetLOC(userName))
+	commitResp := fmt.Sprintf("%s Total Commits => *%d* ", emojiFingure, GetCommitCount(userName))
+	response := `
+	` + emojiAvatar + ` *` + userName + `*
+	-----------------------------------------------
+	` + locResp + `
+	` + commitResp + `
+	` + langResp
 
-	// fmt.Println(response)
 	return response
 }
 
 func ServeGogit(w http.ResponseWriter, args map[string]string, isCmdValid bool) {
-	fmt.Println("within ServeGogit")
-	io.WriteString(w, "within ServeGogit")
-
 	if args["--help"] != "" || isCmdValid == false {
 		getHelp(w)
 	} else if args["--name="] != "" {
-		io.WriteString(w, "with name")
-		io.WriteString(w, "with name")
-		fmt.Println("within else if args == --name")
-		// response := getInsight(w, args["--name"])
-		// io.WriteString(w, response)
+		response := getInsight(args["--name="])
+		io.WriteString(w, response)
 	} else {
-		io.WriteString(w, "default name")
-		io.WriteString(w, "default name")
-		// response := getInsight(w, utils.DefaultUserName)
-		// io.WriteString(w, response)
-
+		response := getInsight(utils.DefaultUserName)
+		io.WriteString(w, response)
 	}
 }

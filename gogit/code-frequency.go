@@ -2,36 +2,47 @@ package gogit
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
+	"fmt"
 
 	"github.com/NavenduDuari/goinfo/gogit/utils"
 )
 
-func getCodeFrequency(w http.ResponseWriter) []utils.CodeFreqStruct {
-	io.WriteString(w, "within getCodeFrequency")
-
-	repos := getRepos(w)
+func getCodeFrequency(userName string) []utils.CodeFreqStruct {
+	repos := getRepos(userName)
+	fmt.Println("Repos => ", len(repos))
 	var codeFreqs []utils.CodeFreqStruct
-	for _, repo := range repos {
+	go func() {
+		for _, repo := range repos {
+			codeFrequencyURL := getCodeFrequencyURL(userName, repo.Name)
+			fmt.Println("LOC URL: ", codeFrequencyURL)
+			go getInfo(codeFrequencyURL)
+
+		}
+	}()
+
+	for i := 1; i <= len(repos); i++ {
+		rawCodeFreq, ok := <-utils.RawInfo
+		if !ok {
+			continue
+		}
 		var codeFreq utils.CodeFreqStruct
-		codeFrequencyURL := getCodeFrequencyURL(repo.Name)
-		rawCodeFreq := getInfo(w, codeFrequencyURL)
 		json.Unmarshal([]byte(rawCodeFreq), &codeFreq)
 		codeFreqs = append(codeFreqs, codeFreq)
 	}
 	return codeFreqs
 }
 
-func GetLOC(w http.ResponseWriter) int64 {
-	io.WriteString(w, "within GetLOC")
-
+func GetLOC(userName string) int64 {
 	var totalLOC int64
-	codeFreqs := getCodeFrequency(w)
+	codeFreqs := getCodeFrequency(userName)
 	for _, codeFreq := range codeFreqs {
 		for _, weeklyArr := range codeFreq {
+			if len(weeklyArr) == 0 {
+				continue
+			}
 			totalLOC = totalLOC + weeklyArr[1] + weeklyArr[2]
 		}
 	}
+	// utils.GetLOC <- totalLOC
 	return totalLOC
 }

@@ -2,34 +2,41 @@ package gogit
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
+	"fmt"
 
 	"github.com/NavenduDuari/goinfo/gogit/utils"
 )
 
-func getCommit(w http.ResponseWriter) []utils.CommitStruct {
-	io.WriteString(w, "within getCommit")
-
+func getCommit(userName string) []utils.CommitStruct {
 	var commitStructArr []utils.CommitStruct
-	repos := getRepos(w)
-	for _, repo := range repos {
+	repos := getRepos(userName)
+	go func() {
+		for _, repo := range repos {
+			commitURL := getCommitURL(userName, repo.Name)
+			fmt.Println("Commit URL: ", commitURL)
+			go getInfo(commitURL)
+		}
+	}()
+
+	for i := 1; i <= len(repos); i++ {
+		rawCommitInfo, ok := <-utils.RawInfo
+		if !ok {
+			continue
+		}
 		var commitStruct utils.CommitStruct
-		commitURL := getCommitURL(repo.Name)
-		rawCommitInfo := getInfo(w, commitURL)
 		json.Unmarshal([]byte(rawCommitInfo), &commitStruct)
 		commitStructArr = append(commitStructArr, commitStruct)
 	}
+
 	return commitStructArr
 }
 
-func GetCommitCount(w http.ResponseWriter) int {
-	io.WriteString(w, "within GetCommitCount")
-
+func GetCommitCount(userName string) int {
 	var totalCommit int
-	commitStructArr := getCommit(w)
+	commitStructArr := getCommit(userName)
 	for _, commitStruct := range commitStructArr {
 		totalCommit += len(commitStruct)
 	}
+	// utils.GetCommit <- totalCommit
 	return totalCommit
 }
