@@ -37,7 +37,8 @@ func getHelp(w http.ResponseWriter) {
 
 	Example:
 	*covid*		//gives data of India
-	*covid --state=WB*		//gives data of West Bengal`
+	*covid --state=WB*		//gives data of West Bengal
+	`
 
 	io.WriteString(w, content)
 }
@@ -49,33 +50,34 @@ func SendCovidWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 		getSuggestion(w)
 	} else if args["--help"] != "" || isCmdValid == false {
 		getHelp(w)
-	}
+	} else {
+		stateFound := false
+		stateInfo := ""
+		for _, stateData := range covidObj.Statewise {
+			if stateData.Statecode == args["--state="] {
+				todayData = stateData
+				stateFound = true
+				stateInfo = `State: ` + todayData.State + "(" + todayData.Statecode + ")"
+				break
+			}
+		}
+		todayData = covidObj.Statewise[0] //TOTAL WARN: dependent on struct
 
-	stateFound := false
-	stateInfo := ""
-	for _, stateData := range covidObj.Statewise {
-		if stateData.Statecode == args["--state="] {
-			todayData = stateData
-			stateFound = true
-			stateInfo = `State: ` + todayData.State + "(" + todayData.Statecode + ")"
-			break
+		msg = `Last Updated: ` + todayData.Lastupdatedtime + `
+			` + stateInfo + `
+	Total confirmed cases: ` + todayData.Confirmed + "(+" + todayData.Deltaconfirmed + ")" + `
+	Total deceased: ` + todayData.Deaths + "(+" + todayData.Deltadeaths + ")" + `
+	Total recovered: ` + todayData.Recovered + "(+" + todayData.Deltarecovered + ")" + `
+	Stay HOME, Stay SAFE` + `
+			`
+
+		io.WriteString(w, msg)
+
+		if !stateFound {
+			getSuggestion(w)
 		}
 	}
-	todayData = covidObj.Statewise[0] //TOTAL WARN: dependent on struct
 
-	msg = `Last Updated: ` + todayData.Lastupdatedtime + `
-		` + stateInfo + `
-Total confirmed cases: ` + todayData.Confirmed + "(+" + todayData.Deltaconfirmed + ")" + `
-Total deceased: ` + todayData.Deaths + "(+" + todayData.Deltadeaths + ")" + `
-Total recovered: ` + todayData.Recovered + "(+" + todayData.Deltarecovered + ")" + `
-Stay HOME, Stay SAFE` + `
-		`
-
-	io.WriteString(w, msg)
-
-	if !stateFound {
-		getSuggestion(w)
-	}
 }
 
 func getSuggestion(w http.ResponseWriter) {
