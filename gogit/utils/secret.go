@@ -1,3 +1,3 @@
 package utils
 
-var GithubToken = "80155906eb716f0f7e5cb4f9df491d6b3d121bee"
+var GithubToken = "4cc4db42fea3ca7a791f247092ade70c606a0fc6"
