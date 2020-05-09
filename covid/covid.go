@@ -52,58 +52,34 @@ func SendCovidWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 	}
 
 	stateFound := false
+	stateInfo := ""
 	for _, stateData := range covidObj.Statewise {
 		if stateData.Statecode == args["--state="] {
 			todayData = stateData
 			stateFound = true
+			stateInfo = `State: ` + todayData.State + "(" + todayData.Statecode + ")"
+			break
 		}
 	}
 	todayData = covidObj.Statewise[0] //TOTAL WARN: dependent on struct
-	if !stateFound {
-		getSuggestion(w)
-	}
+
 	msg = `Last Updated: ` + todayData.Lastupdatedtime + `
-State: ` + todayData.State + "(" + todayData.Statecode + ")" + `
+		` + stateInfo + `
 Total confirmed cases: ` + todayData.Confirmed + "(+" + todayData.Deltaconfirmed + ")" + `
 Total deceased: ` + todayData.Deaths + "(+" + todayData.Deltadeaths + ")" + `
 Total recovered: ` + todayData.Recovered + "(+" + todayData.Deltarecovered + ")" + `
 Stay HOME, Stay SAFE` + `
 		`
 
-	// 	} else if args["--state="] != "" {
-	// 		var stateFound bool
-	// 		for _, stateData := range covidObj.Statewise {
-	// 			if stateData.Statecode == args["--state="] {
-	// 				todayData = stateData
-	// 				stateFound = true
-	// 			}
-	// 		}
-	// 		if !stateFound {
-	// 			getSuggestion(w)
-	// 			return
-	// 		}
-	// 		msg = `Last Updated: ` + todayData.Lastupdatedtime + `
-	// State: ` + todayData.State + "(" + todayData.Statecode + ")" + `
-	// Total confirmed cases: ` + todayData.Confirmed + "(+" + todayData.Deltaconfirmed + ")" + `
-	// Total deceased: ` + todayData.Deaths + "(+" + todayData.Deltadeaths + ")" + `
-	// Total recovered: ` + todayData.Recovered + "(+" + todayData.Deltarecovered + ")" + `
-	// Stay HOME, Stay SAFE` + `
-	// 		`
-	// 	} else {
-	// 		todayData := covidObj.Cases_time_series[len(covidObj.Cases_time_series)-1]
-	// 		msg = `Last Updated: ` + todayData.Date + `
-	// Total confirmed cases: ` + todayData.Totalconfirmed + "(+" + todayData.Dailyconfirmed + ")" + `
-	// Total deceased: ` + todayData.Totaldeceased + "(+" + todayData.Dailydeceased + ")" + `
-	// Total recovered: ` + todayData.Totalrecovered + "(+" + todayData.Dailyrecovered + ")" + `
-	// Stay HOME, Stay SAFE` + `
-	// 	`
-	// 	}
-
 	io.WriteString(w, msg)
+
+	if !stateFound {
+		getSuggestion(w)
+	}
 }
 
 func getSuggestion(w http.ResponseWriter) {
-	content := ""
+	content := "---------------------------------------\n"
 	for stateId, stateName := range utils.States {
 		content = content + `
 		Name: ` + stateName + ` Id: *` + stateId + `*
