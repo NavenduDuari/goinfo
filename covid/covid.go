@@ -80,7 +80,7 @@ Stay HOME, Stay SAFE` + `
 
 func getSuggestion(w http.ResponseWriter) {
 	content := `-------------------------------------------------------------
-	TRY *covid --sate=Id*
+	TRY *covid --state=Id*
 	`
 	for stateId, stateName := range utils.States {
 		content = content + `
