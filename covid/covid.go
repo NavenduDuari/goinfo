@@ -53,6 +53,7 @@ func SendCovidWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 	} else {
 		stateFound := false
 		stateInfo := ""
+		todayData = covidObj.Statewise[0] //TOTAL WARN: dependent on struct
 		for _, stateData := range covidObj.Statewise {
 			if stateData.Statecode == args["--state="] {
 				todayData = stateData
@@ -61,7 +62,6 @@ func SendCovidWs(w http.ResponseWriter, args map[string]string, isCmdValid bool)
 				break
 			}
 		}
-		todayData = covidObj.Statewise[0] //TOTAL WARN: dependent on struct
 
 		msg = `Last Updated: ` + todayData.Lastupdatedtime + `
 			` + stateInfo + `

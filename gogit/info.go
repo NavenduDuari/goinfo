@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/NavenduDuari/goinfo/gogit/utils"
 )
@@ -31,7 +32,7 @@ func getReposURL(userName string) string {
 }
 
 func getInfo(url string) {
-	var bearer = "Bearer " + utils.GithubToken
+	var bearer = "Bearer " + os.Getenv("GITHUB_ACCESS_TOKEN_FOR_GOINFO")
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", bearer)
 	client := &http.Client{}
